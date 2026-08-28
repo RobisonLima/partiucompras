@@ -74,6 +74,68 @@
 .btn.filter{background:#fff;color:#34423e;border:1px solid var(--line)}
 @media(max-width:720px){.price-edit-wrap{justify-content:flex-start}.list-controls{padding:14px}.list-controls .btn{flex:1 1 100%}}
 
+
+    .dispensa-section{
+      background:#ffffff;
+      border:2px solid #dce7e4;
+    }
+    .dispensa-section .section-header{background:#f8fbfa;}
+    .compras-section{
+      background:#e9edf0 !important;
+      border:2px solid #cfd6da;
+    }
+    .compras-section .section-header{background:#dde3e7 !important;}
+    .search-wrap{
+      display:flex;align-items:center;gap:8px;padding:14px 18px 4px;
+    }
+    .search-icon{font-size:1.15rem;}
+    .search-input{
+      width:100%;border:1px solid #cbd6d3;border-radius:12px;
+      padding:11px 13px;outline:none;background:#fff;
+    }
+    .search-input:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(15,118,110,.10);
+    }
+    .value-mode{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-top:2px;}
+    .radio-option{display:flex;align-items:center;gap:6px;font-weight:700;}
+    .unit-values{display:grid;gap:10px;margin-top:10px;}
+    .unit-value-row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:10px;}
+    .unit-value-row label{margin:0;font-weight:700;color:#4a5a55;}
+
+
+    .btn.btn-blue{
+      background:#1976d2;
+      color:#fff;
+      border:1px solid #1565c0;
+    }
+
+    .btn.btn-orange{
+      background:#f57c00;
+      color:#fff;
+      border:1px solid #ef6c00;
+    }
+
+    .btn.btn-yellow{
+      background:#facc15;
+      color:#4a3b00;
+      border:1px solid #eab308;
+    }
+
+    .btn.btn-blue:hover{background:#1565c0;}
+    .btn.btn-orange:hover{background:#ef6c00;}
+    .btn.btn-yellow:hover{background:#eab308;}
+
+
+    #sameValueField{
+      padding:12px 0 2px;
+      border-top:1px solid var(--line);
+    }
+    #sameValueField > label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:750;
+    }
 </style>
 </head>
 <body>
@@ -82,32 +144,168 @@
       <h1>Partiu Compras <span aria-hidden="true">🛒</span></h1>
       <p>Sua lista inteligente de compras</p>
     </header>
-<section class="total-card"><small>Total da compra</small><strong id="totalCompra">R$ 0,00</strong></section>
-<section class="section"><div class="section-header"><div><h2 class="section-title">DISPENSA</h2><div class="section-subtitle">Produtos que você já tem em casa</div></div><button class="add-btn" id="btnAddDispensa">+</button></div><div id="listaDispensa"></div></section>
+<section class="total-card"><small>Total da compra</small><strong id="totalCompra">R$ 0,00</strong>
+      <div id="totalItens" style="margin-top:14px;font-size:1.05rem;font-weight:800;opacity:.95;">Total de itens: 0</div></section>
+<section class="section"><div class="section-header"><div><h2 class="section-title">DISPENSA</h2><div class="section-subtitle">Produtos que você já tem em casa</div></div><button class="add-btn" id="btnAddDispensa">+</button></div><div class="search-wrap">
+        <span class="search-icon">🔎</span>
+        <input id="searchDispensa" class="search-input" placeholder="Pesquisar na dispensa..." autocomplete="off">
+      </div>
+      <div id="listaDispensa"></div></section>
 
-    <section class="section compras-section"><div class="section-header"><div><h1 class="section-title">LISTA DE COMPRAS</h1><div class="section-subtitle">Cadastre o produto e a quantidade. Adicione o valor quando estiver no mercado.</div></div><button class="add-btn" id="btnAddCompra">+</button></div><div id="listaCompras"></div><div class="list-controls"><button type="button" class="btn danger-soft" id="btnLimparCompras">Limpar toda lista</button><button type="button" class="btn filter" id="btnFaltouComprar">Ver o que faltou comprar</button><button type="button" class="btn filter" id="btnMostrarTudo">Mostrar tudo</button></div></section>
+    <section class="section compras-section"><div class="section-header"><div><h1 class="section-title">LISTA DE COMPRAS</h1><div class="section-subtitle">Cadastre o produto e a quantidade. Adicione o valor quando estiver no mercado.</div></div><button class="add-btn" id="btnAddCompra">+</button></div><div class="search-wrap">
+        <span class="search-icon">🔎</span>
+        <input id="searchCompras" class="search-input" placeholder="Pesquisar na lista de compras..." autocomplete="off">
+      </div>
+      <div id="listaCompras"></div><div class="list-controls"><button type="button" class="btn danger-soft" id="btnLimparCompras">Limpar toda lista</button><button type="button" class="btn btn-blue" id="btnFaltouComprar">Ver o que faltou comprar</button><button type="button" class="btn btn-orange" id="btnMostrarTudo">Mostrar tudo</button><button type="button" class="btn btn-yellow" id="btnTopo">Subir ao topo</button></div></section>
     <footer class="footer-note">
       Feito por Robison S de Lima
     </footer>
 </main>
-<div class="modal-backdrop" id="formModal"><div class="modal"><h2 id="modalTitle">Adicionar item</h2><form id="itemForm"><div class="form-grid"><div class="field"><label for="nome">Nome do produto</label><input id="nome" required maxlength="80" placeholder="Ex.: Nescau" autocomplete="off"></div><div class="field" id="priceField"><label for="preco">Preço unitário</label><input id="preco" inputmode="decimal" placeholder="Ex.: 12,90"></div><div class="field"><label for="quantidade">Quantidade</label><input id="quantidade" type="number" min="1" step="1" value="1" required></div></div><div class="modal-actions"><button type="button" class="btn secondary" id="btnCancelar">Cancelar</button><button type="submit" class="btn primary">Salvar</button></div></form></div></div>
+<div class="modal-backdrop" id="formModal"><div class="modal"><h2 id="modalTitle">Adicionar item</h2><form id="itemForm"><div class="form-grid"><div class="field"><label for="nome">Nome do produto</label><input id="nome" required maxlength="80" placeholder="Ex.: Nescau" autocomplete="off"></div><div class="field" id="priceField"><label for="preco">Preço unitário</label><input id="preco" inputmode="decimal" placeholder="Ex.: 12,90"></div><div class="field"><label for="quantidade">Quantidade</label><input id="quantidade" type="number" min="1" step="1" value="1" required></div>
+<div class="field" id="valorChoiceField">
+  <label>Informar o valor?</label>
+  <div class="value-mode">
+    <label class="radio-option"><input type="radio" name="informarValor" value="nao" checked> Não</label>
+    <label class="radio-option"><input type="radio" name="informarValor" value="sim"> Sim</label>
+  </div>
+
+  <div id="sameValueField" style="display:none;margin-top:14px;">
+    <label>Os itens são todos do mesmo valor?</label>
+    <div class="value-mode">
+      <label class="radio-option"><input type="radio" name="mesmoValor" value="sim" checked> Sim</label>
+      <label class="radio-option"><input type="radio" name="mesmoValor" value="nao"> Não</label>
+    </div>
+  </div>
+
+  <div id="unitValues" class="unit-values" style="display:none;"></div>
+</div></div><div class="modal-actions"><button type="button" class="btn secondary" id="btnCancelar">Cancelar</button><button type="submit" class="btn primary">Salvar</button></div></form></div></div>
 <div class="modal-backdrop" id="confirmModal"><div class="modal"><h2>Item encontrado na dispensa</h2><p class="confirm-text">O item <span class="confirm-product" id="confirmProduct"></span> já existe na dispensa. Deseja incluir mesmo assim na lista de compras?</p><div class="modal-actions"><button type="button" class="btn secondary" id="confirmNo">Não</button><button type="button" class="btn primary" id="confirmYes">Sim, incluir</button></div></div></div>
+<div class="modal-backdrop" id="actionConfirmModal">
+    <div class="modal">
+      <h2 id="actionConfirmTitle">Confirmar</h2>
+      <p class="confirm-text" id="actionConfirmText"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="actionConfirmNo">NÃO</button>
+        <button type="button" class="btn primary" id="actionConfirmYes">SIM</button>
+      </div>
+    </div>
+  </div>
+
 <script>
-const STORAGE_COMPRAS='lista_compras_v1',STORAGE_DISPENSA='dispensa_v1';let compras=load(STORAGE_COMPRAS),dispensa=load(STORAGE_DISPENSA),currentType='compra',editingId=null,pendingPurchase=null,filtroCompras='todos';const formModal=document.getElementById('formModal'),confirmModal=document.getElementById('confirmModal'),itemForm=document.getElementById('itemForm'),nomeInput=document.getElementById('nome'),precoInput=document.getElementById('preco'),quantidadeInput=document.getElementById('quantidade'),priceField=document.getElementById('priceField');
+const STORAGE_COMPRAS='lista_compras_v1',STORAGE_DISPENSA='dispensa_v1';let compras=load(STORAGE_COMPRAS),dispensa=load(STORAGE_DISPENSA),currentType='compra',editingId=null,pendingPurchase=null,filtroCompras='todos',buscaCompras='',buscaDispensa='',pendingConfirmAction=null;const formModal=document.getElementById('formModal'),confirmModal=document.getElementById('confirmModal'),itemForm=document.getElementById('itemForm'),nomeInput=document.getElementById('nome'),precoInput=document.getElementById('preco'),quantidadeInput=document.getElementById('quantidade'),priceField=document.getElementById('priceField');
 function load(k){try{const d=JSON.parse(localStorage.getItem(k));return Array.isArray(d)?d:[]}catch{return[]}}function save(){localStorage.setItem(STORAGE_COMPRAS,JSON.stringify(compras));localStorage.setItem(STORAGE_DISPENSA,JSON.stringify(dispensa));render()}function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}function normalizeName(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ')}function parseMoney(v){let t=String(v||'').trim().replace(/\s/g,'');if(!t)return 0;if(t.includes(',')&&t.includes('.'))t=t.lastIndexOf(',')>t.lastIndexOf('.')?t.replace(/\./g,'').replace(',','.'):t.replace(/,/g,'');else if(t.includes(','))t=t.replace(',','.');const n=Number(t.replace(/[^\d.-]/g,''));return Number.isFinite(n)?n:0}function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}function esc(t){return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}function existsInPantry(n){const x=normalizeName(n);return dispensa.some(i=>normalizeName(i.nome)===x)}
-function openForm(type,item=null){currentType=type;editingId=item?item.id:null;document.getElementById('modalTitle').textContent=item?(type==='compra'?'Editar item da compra':'Editar item da dispensa'):(type==='compra'?'Adicionar à lista de compras':'Adicionar à dispensa');priceField.style.display='none';nomeInput.value=item?.nome||'';precoInput.value='';quantidadeInput.value=item?.quantidade||1;formModal.classList.add('open');setTimeout(()=>nomeInput.focus(),50)}function closeForm(){formModal.classList.remove('open');itemForm.reset();quantidadeInput.value=1;editingId=null}
-function render(){renderCompras();renderDispensa();document.getElementById('totalCompra').textContent=money(compras.reduce((s,i)=>s+Number(i.preco)*Number(i.quantidade),0))}
-function renderCompras(){const el=document.getElementById('listaCompras');if(!compras.length){el.innerHTML='<div class="empty">Nenhum item na lista de compras. Toque no <strong>+</strong> para adicionar.</div>';return}const lista=filtroCompras==='faltando'?compras.filter(i=>!i.picked):compras;if(!lista.length){el.innerHTML='<div class="empty">Todos os itens já foram marcados como comprados.</div>';return}el.innerHTML=lista.map(i=>{const preco=Number(i.preco||0),sub=preco*Number(i.quantidade),textoPreco=preco>0?money(preco):'Adicionar valor';return `<div class="item ${i.picked?'picked':''}"><div><div class="product-name ${i.pantryMatched?'in-pantry':''}">${esc(i.nome)}</div><div class="item-meta">${i.quantidade} un.${preco>0?` • Total: ${money(sub)}`:''}</div></div><div class="price-edit-wrap"><div class="price-display ${preco>0?'':'empty'}">${textoPreco}</div><button class="icon-btn" onclick="editarValorCompra('${i.id}')" title="Adicionar ou editar valor">✏️</button></div><div class="qty">${i.quantidade} un.</div><div class="actions purchase-actions"><button class="icon-btn check" onclick="togglePicked('${i.id}')" title="${i.picked?'Desmarcar':'Marcar como comprado'}">✓</button><button class="icon-btn" onclick="editCompra('${i.id}')" title="Editar nome ou quantidade">📝</button><button class="icon-btn delete" onclick="deleteCompra('${i.id}')" title="Excluir">🗑️</button></div></div>`}).join('')}
-function renderDispensa(){const el=document.getElementById('listaDispensa');if(!dispensa.length){el.innerHTML='<div class="empty">Nenhum item cadastrado na dispensa. Toque no <strong>+</strong> para adicionar.</div>';return}el.innerHTML=dispensa.map(i=>`<div class="item"><div><div class="product-name">${esc(i.nome)}</div><div class="item-meta">${i.quantidade} un. na dispensa</div></div><div class="value"></div><div class="pantry-count">${i.quantidade} un.</div><div class="actions"><button class="icon-btn" onclick="editDispensa('${i.id}')">✏️</button><button class="icon-btn delete" onclick="deleteDispensa('${i.id}')">🗑️</button></div></div>`).join('')}
-function editarValorCompra(id){const item=compras.find(x=>x.id===id);if(!item)return;const atual=Number(item.preco||0);const entrada=prompt(`Informe o valor unitário de "${item.nome}":`,atual>0?atual.toFixed(2).replace('.',','):'');if(entrada===null)return;const preco=parseMoney(entrada);if(preco<0){alert('Informe um valor válido.');return}compras=compras.map(x=>x.id===id?{...x,preco}:x);save()}
+function openForm(type,item=null){currentType=type;editingId=item?item.id:null;document.getElementById('modalTitle').textContent=item?(type==='compra'?'Editar item da compra':'Editar item da dispensa'):(type==='compra'?'Adicionar à lista de compras':'Adicionar à dispensa');if(priceField)priceField.style.display='none';const valorChoiceField=document.getElementById('valorChoiceField');if(valorChoiceField)valorChoiceField.style.display=type==='compra'?'block':'none';nomeInput.value=item?.nome||'';precoInput.value='';quantidadeInput.value=item?.quantidade||1;const radioNao=document.querySelector('input[name="informarValor"][value="nao"]');if(radioNao)radioNao.checked=true;const mesmoValorSim=document.querySelector('input[name="mesmoValor"][value="sim"]');if(mesmoValorSim)mesmoValorSim.checked=true;const sameValueField=document.getElementById('sameValueField');if(sameValueField)sameValueField.style.display='none';const unitValues=document.getElementById('unitValues');if(unitValues){unitValues.style.display='none';unitValues.innerHTML='';}formModal.classList.add('open');setTimeout(()=>nomeInput.focus(),50)}function renderUnitValueInputs(){
+  const container=document.getElementById('unitValues');
+  const sameValueField=document.getElementById('sameValueField');
+  if(!container)return;
+
+  const qtd=Math.max(1,parseInt(quantidadeInput.value||'1',10));
+  const informar=document.querySelector('input[name="informarValor"]:checked')?.value==='sim';
+
+  if(currentType!=='compra'||!informar){
+    container.style.display='none';
+    container.innerHTML='';
+    if(sameValueField)sameValueField.style.display='none';
+    return;
+  }
+
+  // A pergunta sobre mesmo valor só aparece se houver mais de 1 unidade.
+  if(sameValueField){
+    sameValueField.style.display=qtd>1?'block':'none';
+  }
+
+  // Com apenas 1 item, basta um único campo de valor.
+  if(qtd===1){
+    container.style.display='grid';
+    container.innerHTML=`<div class="unit-value-row"><label>Valor</label><input type="text" inputmode="decimal" class="unit-price-input" placeholder="R$ 0,00"></div>`;
+    return;
+  }
+
+  const mesmoValor=document.querySelector('input[name="mesmoValor"]:checked')?.value!=='nao';
+
+  container.style.display='grid';
+
+  if(mesmoValor){
+    container.innerHTML=`<div class="unit-value-row"><label>Valor unitário</label><input type="text" inputmode="decimal" class="unit-price-input same-price-input" placeholder="R$ 0,00"></div>`;
+  }else{
+    container.innerHTML=Array.from({length:qtd},(_,idx)=>
+      `<div class="unit-value-row"><label>Item ${idx+1}</label><input type="text" inputmode="decimal" class="unit-price-input" placeholder="R$ 0,00"></div>`
+    ).join('');
+  }
+}
+function closeForm(){formModal.classList.remove('open');itemForm.reset();quantidadeInput.value=1;editingId=null}
+function render(){renderCompras();renderDispensa();const total=compras.reduce((s,i)=>{if(Array.isArray(i.precos)&&i.precos.length)return s+i.precos.reduce((a,b)=>a+Number(b||0),0);return s+Number(i.preco||0)*Number(i.quantidade||0)},0);document.getElementById('totalCompra').textContent=money(total);const totalItens=document.getElementById('totalItens');if(totalItens)totalItens.textContent=`Total de itens: ${compras.reduce((s,i)=>s+Number(i.quantidade||0),0)}`}
+function renderCompras(){const el=document.getElementById('listaCompras');if(!compras.length){el.innerHTML='<div class="empty">Nenhum item na lista de compras. Toque no <strong>+</strong> para adicionar.</div>';return}let lista=filtroCompras==='faltando'?compras.filter(i=>!i.picked):compras;if(buscaCompras)lista=lista.filter(i=>normalizeName(i.nome).includes(normalizeName(buscaCompras)));if(!lista.length){el.innerHTML='<div class="empty">Nenhum item encontrado.</div>';return}el.innerHTML=lista.map(i=>{const precos=Array.isArray(i.precos)?i.precos:[];const somaPrecos=precos.length?precos.reduce((a,b)=>a+Number(b||0),0):Number(i.preco||0)*Number(i.quantidade||0);const textoPreco=precos.length?precos.map((p,idx)=>`Item ${idx+1}: ${money(p)}`).join('<br>'):(Number(i.preco||0)>0?money(i.preco):'Adicionar valor');return `<div class="item ${i.picked?'picked':''}"><div><div class="product-name ${i.pantryMatched?'in-pantry':''}">${esc(i.nome)}</div><div class="item-meta">${i.quantidade} un.${somaPrecos>0?` • Total: ${money(somaPrecos)}`:''}</div></div><div class="price-edit-wrap"><div class="price-display ${somaPrecos>0?'':'empty'}">${textoPreco}</div><button class="icon-btn" onclick="editarValorCompra('${i.id}')" title="Adicionar ou editar valor">✏️</button></div><div class="qty">${i.quantidade} un.</div><div class="actions purchase-actions"><button class="icon-btn check" onclick="togglePicked('${i.id}')" title="${i.picked?'Desmarcar':'Marcar como comprado'}">✓</button><button class="icon-btn" onclick="editCompra('${i.id}')" title="Editar nome ou quantidade">📝</button><button class="icon-btn delete" onclick="deleteCompra('${i.id}')" title="Excluir">🗑️</button></div></div>`}).join('')}
+
+function renderDispensa(){const el=document.getElementById('listaDispensa');let lista=dispensa;if(buscaDispensa)lista=lista.filter(i=>normalizeName(i.nome).includes(normalizeName(buscaDispensa)));if(!lista.length){el.innerHTML='<div class="empty">Nenhum item encontrado na dispensa.</div>';return}el.innerHTML=lista.map(i=>`<div class="item"><div><div class="product-name">${esc(i.nome)}</div><div class="item-meta">${i.quantidade} un. na dispensa</div></div><div class="value"></div><div class="pantry-count">${i.quantidade} un.</div><div class="actions"><button class="icon-btn" onclick="editDispensa('${i.id}')">✏️</button><button class="icon-btn delete" onclick="deleteDispensa('${i.id}')">🗑️</button></div></div>`).join('')}
+
+function editarValorCompra(id){const item=compras.find(x=>x.id===id);if(!item)return;const qtd=Math.max(1,Number(item.quantidade||1));const novos=[];for(let idx=0;idx<qtd;idx++){const atual=Array.isArray(item.precos)&&item.precos[idx]!=null?Number(item.precos[idx]):0;const entrada=prompt(`Valor do item ${idx+1} de ${qtd} - "${item.nome}":`,atual>0?atual.toFixed(2).replace('.',','):'');if(entrada===null)return;novos.push(parseMoney(entrada));}compras=compras.map(x=>x.id===id?{...x,precos:novos,preco:0}:x);save()}
 function togglePicked(id){compras=compras.map(i=>i.id===id?{...i,picked:!i.picked}:i);save()}
-function editCompra(id){const i=compras.find(x=>x.id===id);if(i)openForm('compra',i)}function editDispensa(id){const i=dispensa.find(x=>x.id===id);if(i)openForm('dispensa',i)}function deleteCompra(id){if(confirm('Deseja excluir este item da lista de compras?')){compras=compras.filter(x=>x.id!==id);save()}}function deleteDispensa(id){if(confirm('Deseja excluir este item da dispensa?')){dispensa=dispensa.filter(x=>x.id!==id);compras=compras.map(i=>({...i,pantryMatched:existsInPantry(i.nome)}));save()}}
-function commitPurchase(item){if(editingId)compras=compras.map(x=>x.id===editingId?{...item,id:editingId,preco:Number(x.preco||0),picked:!!x.picked}:x);else compras.push({...item,id:uid(),preco:0,picked:false});save();closeForm()}
-itemForm.addEventListener('submit',e=>{e.preventDefault();const nome=nomeInput.value.trim(),quantidade=Math.max(1,parseInt(quantidadeInput.value||'1',10));if(!nome)return;if(currentType==='dispensa'){const item={nome,quantidade};if(editingId)dispensa=dispensa.map(x=>x.id===editingId?{...item,id:editingId}:x);else dispensa.push({...item,id:uid()});compras=compras.map(c=>({...c,pantryMatched:existsInPantry(c.nome)||normalizeName(c.nome)===normalizeName(nome)}));save();closeForm();return}const pantryMatch=existsInPantry(nome),item={nome,preco:0,quantidade,pantryMatched:pantryMatch};if(pantryMatch){pendingPurchase=item;document.getElementById('confirmProduct').textContent=`"${nome}"`;confirmModal.classList.add('open');return}commitPurchase(item)});
-document.getElementById('btnLimparCompras').onclick=()=>{if(!compras.length)return;if(confirm('Deseja realmente limpar toda a lista de compras?')){compras=[];filtroCompras='todos';save()}};
+function openActionConfirm(message,action,title='Confirmar'){
+  const modal=document.getElementById('actionConfirmModal');
+  document.getElementById('actionConfirmTitle').textContent=title;
+  document.getElementById('actionConfirmText').textContent=message;
+  pendingConfirmAction=action;
+  modal.classList.add('open');
+}
+function closeActionConfirm(){
+  document.getElementById('actionConfirmModal').classList.remove('open');
+  pendingConfirmAction=null;
+}
+function editCompra(id){const i=compras.find(x=>x.id===id);if(i)openForm('compra',i)}
+function editDispensa(id){const i=dispensa.find(x=>x.id===id);if(i)openForm('dispensa',i)}
+function deleteCompra(id){
+  const item=compras.find(x=>x.id===id);
+  if(!item)return;
+  openActionConfirm(`Deseja excluir "${item.nome}" da lista de compras?`,()=>{
+    compras=compras.filter(x=>x.id!==id);
+    save();
+  },'Excluir item');
+}
+function deleteDispensa(id){
+  const item=dispensa.find(x=>x.id===id);
+  if(!item)return;
+  openActionConfirm(`Deseja excluir "${item.nome}" da dispensa?`,()=>{
+    dispensa=dispensa.filter(x=>x.id!==id);
+    compras=compras.map(i=>({...i,pantryMatched:existsInPantry(i.nome)}));
+    save();
+  },'Excluir item');
+}
+function commitPurchase(item){if(editingId)compras=compras.map(x=>x.id===editingId?{...item,id:editingId,preco:Number(x.preco||0),precos:Array.isArray(x.precos)?x.precos.slice(0,Number(item.quantidade||1)):[],picked:!!x.picked}:x);else compras.push({...item,id:uid(),preco:0,precos:Array.isArray(item.precos)?item.precos:[],picked:false});save();closeForm()}
+itemForm.addEventListener('submit',e=>{e.preventDefault();const nome=nomeInput.value.trim(),quantidade=Math.max(1,parseInt(quantidadeInput.value||'1',10));if(!nome)return;if(currentType==='dispensa'){const item={nome,quantidade};if(editingId)dispensa=dispensa.map(x=>x.id===editingId?{...item,id:editingId}:x);else dispensa.push({...item,id:uid()});compras=compras.map(c=>({...c,pantryMatched:existsInPantry(c.nome)||normalizeName(c.nome)===normalizeName(nome)}));save();closeForm();return}let precos=[];if(currentType==='compra'&&document.querySelector('input[name="informarValor"]:checked')?.value==='sim'){const qtdAtual=Math.max(1,parseInt(quantidadeInput.value||'1',10));const mesmoValor=qtdAtual===1||document.querySelector('input[name="mesmoValor"]:checked')?.value!=='nao';const inputs=[...document.querySelectorAll('.unit-price-input')];if(mesmoValor&&inputs.length){const valorUnitario=parseMoney(inputs[0].value);precos=Array.from({length:qtdAtual},()=>valorUnitario);}else{precos=inputs.map(inp=>parseMoney(inp.value));}}const pantryMatch=existsInPantry(nome),item={nome,preco:0,precos,quantidade,pantryMatched:pantryMatch};if(pantryMatch){pendingPurchase=item;document.getElementById('confirmProduct').textContent=`"${nome}"`;confirmModal.classList.add('open');return}commitPurchase(item)});
+document.querySelectorAll('input[name="informarValor"]').forEach(r=>r.addEventListener('change',renderUnitValueInputs));
+document.querySelectorAll('input[name="mesmoValor"]').forEach(r=>r.addEventListener('change',renderUnitValueInputs));
+quantidadeInput.addEventListener('input',renderUnitValueInputs);
+document.getElementById('searchCompras').addEventListener('input',e=>{buscaCompras=e.target.value;renderCompras()});
+document.getElementById('searchDispensa').addEventListener('input',e=>{buscaDispensa=e.target.value;renderDispensa()});
+document.getElementById('btnTopo').onclick=()=>document.querySelector('.total-card').scrollIntoView({behavior:'smooth',block:'start'});
+document.getElementById('btnLimparCompras').onclick=()=>{
+  if(!compras.length)return;
+  openActionConfirm('VOCÊ TEM CERTEZA QUE DESEJA LIMPAR TODA LISTA?',()=>{
+    compras=[];
+    filtroCompras='todos';
+    save();
+  },'Limpar toda lista');
+};
 document.getElementById('btnFaltouComprar').onclick=()=>{filtroCompras='faltando';renderCompras()};
 document.getElementById('btnMostrarTudo').onclick=()=>{filtroCompras='todos';renderCompras()};
-document.getElementById('btnAddCompra').onclick=()=>openForm('compra');document.getElementById('btnAddDispensa').onclick=()=>openForm('dispensa');document.getElementById('btnCancelar').onclick=closeForm;document.getElementById('confirmNo').onclick=()=>{confirmModal.classList.remove('open');pendingPurchase=null;if(!editingId)closeForm()};document.getElementById('confirmYes').onclick=()=>{confirmModal.classList.remove('open');if(pendingPurchase){pendingPurchase.pantryMatched=true;commitPurchase(pendingPurchase)}pendingPurchase=null};formModal.onclick=e=>{if(e.target===formModal)closeForm()};confirmModal.onclick=e=>{if(e.target===confirmModal){confirmModal.classList.remove('open');pendingPurchase=null}};document.addEventListener('keydown',e=>{if(e.key==='Escape'){formModal.classList.remove('open');confirmModal.classList.remove('open');pendingPurchase=null}});window.editarValorCompra=editarValorCompra;window.togglePicked=togglePicked;window.editCompra=editCompra;window.editDispensa=editDispensa;window.deleteCompra=deleteCompra;window.deleteDispensa=deleteDispensa;render();
+const actionConfirmNo=document.getElementById('actionConfirmNo');
+const actionConfirmYes=document.getElementById('actionConfirmYes');
+const actionConfirmModal=document.getElementById('actionConfirmModal');
+if(actionConfirmNo)actionConfirmNo.onclick=closeActionConfirm;
+if(actionConfirmYes)actionConfirmYes.onclick=()=>{
+  const action=pendingConfirmAction;
+  if(actionConfirmModal)actionConfirmModal.classList.remove('open');
+  pendingConfirmAction=null;
+  if(typeof action==='function')action();
+};
+if(actionConfirmModal)actionConfirmModal.onclick=e=>{
+  if(e.target===actionConfirmModal)closeActionConfirm();
+};
+const btnAddCompra=document.getElementById('btnAddCompra');
+const btnAddDispensa=document.getElementById('btnAddDispensa');
+if(btnAddCompra)btnAddCompra.onclick=()=>openForm('compra');
+if(btnAddDispensa)btnAddDispensa.onclick=()=>openForm('dispensa');document.getElementById('btnCancelar').onclick=closeForm;document.getElementById('confirmNo').onclick=()=>{confirmModal.classList.remove('open');pendingPurchase=null;if(!editingId)closeForm()};document.getElementById('confirmYes').onclick=()=>{confirmModal.classList.remove('open');if(pendingPurchase){pendingPurchase.pantryMatched=true;commitPurchase(pendingPurchase)}pendingPurchase=null};formModal.onclick=e=>{if(e.target===formModal)closeForm()};confirmModal.onclick=e=>{if(e.target===confirmModal){confirmModal.classList.remove('open');pendingPurchase=null}};document.addEventListener('keydown',e=>{if(e.key==='Escape'){formModal.classList.remove('open');confirmModal.classList.remove('open');document.getElementById('actionConfirmModal').classList.remove('open');pendingPurchase=null;pendingConfirmAction=null}});window.editarValorCompra=editarValorCompra;window.togglePicked=togglePicked;window.editCompra=editCompra;window.editDispensa=editDispensa;window.deleteCompra=deleteCompra;window.deleteDispensa=deleteDispensa;render();
 </script>
 </body>
 </html>
