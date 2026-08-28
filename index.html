@@ -136,6 +136,11 @@
       margin-bottom:8px;
       font-weight:750;
     }
+
+    .dispensa-header-actions{display:flex;align-items:center;gap:10px}
+    .btn-hide-pantry{background:#64748b;color:#fff;border:1px solid #526174;white-space:nowrap}
+    .btn-hide-pantry:hover{background:#526174}
+    @media(max-width:520px){.dispensa-header-actions{gap:7px}.btn-hide-pantry{padding:10px 11px;font-size:.78rem}}
 </style>
 </head>
 <body>
@@ -146,11 +151,13 @@
     </header>
 <section class="total-card"><small>Total da compra</small><strong id="totalCompra">R$ 0,00</strong>
       <div id="totalItens" style="margin-top:14px;font-size:1.05rem;font-weight:800;opacity:.95;">Total de itens: 0</div></section>
-<section class="section"><div class="section-header"><div><h2 class="section-title">DISPENSA</h2><div class="section-subtitle">Produtos que você já tem em casa</div></div><button class="add-btn" id="btnAddDispensa">+</button></div><div class="search-wrap">
+<section class="section"><div class="section-header"><div><h2 class="section-title">DISPENSA</h2><div class="section-subtitle">Produtos que você já tem em casa</div></div><div class="dispensa-header-actions"><button type="button" class="btn btn-hide-pantry" id="btnOcultarDispensa">Ocultar lista</button><button class="add-btn" id="btnAddDispensa">+</button></div></div><div id="conteudoDispensa">
+      <div class="search-wrap">
         <span class="search-icon">🔎</span>
         <input id="searchDispensa" class="search-input" placeholder="Pesquisar na dispensa..." autocomplete="off">
       </div>
-      <div id="listaDispensa"></div></section>
+      <div id="listaDispensa"></div>
+      </div></section>
 
     <section class="section compras-section"><div class="section-header"><div><h1 class="section-title">LISTA DE COMPRAS</h1><div class="section-subtitle">Cadastre o produto e a quantidade. Adicione o valor quando estiver no mercado.</div></div><button class="add-btn" id="btnAddCompra">+</button></div><div class="search-wrap">
         <span class="search-icon">🔎</span>
@@ -302,6 +309,15 @@ if(actionConfirmYes)actionConfirmYes.onclick=()=>{
 if(actionConfirmModal)actionConfirmModal.onclick=e=>{
   if(e.target===actionConfirmModal)closeActionConfirm();
 };
+const btnOcultarDispensa=document.getElementById('btnOcultarDispensa');
+const conteudoDispensa=document.getElementById('conteudoDispensa');
+if(btnOcultarDispensa&&conteudoDispensa){
+  btnOcultarDispensa.onclick=()=>{
+    const oculto=conteudoDispensa.style.display==='none';
+    conteudoDispensa.style.display=oculto?'block':'none';
+    btnOcultarDispensa.textContent=oculto?'Ocultar lista':'Mostrar lista';
+  };
+}
 const btnAddCompra=document.getElementById('btnAddCompra');
 const btnAddDispensa=document.getElementById('btnAddDispensa');
 if(btnAddCompra)btnAddCompra.onclick=()=>openForm('compra');
