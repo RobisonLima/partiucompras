@@ -141,6 +141,133 @@
     .btn-hide-pantry{background:#64748b;color:#fff;border:1px solid #526174;white-space:nowrap}
     .btn-hide-pantry:hover{background:#526174}
     @media(max-width:520px){.dispensa-header-actions{gap:7px}.btn-hide-pantry{padding:10px 11px;font-size:.78rem}}
+
+#replicarValorModal .modal-actions{flex-wrap:wrap}
+#replicarValorModal .modal-actions .btn{flex:1 1 190px}
+
+    .camera-btn{
+      background:#eef6ff;
+      border-color:#bfd8f2;
+      color:#24577a;
+    }
+    .camera-btn.has-photo{
+      background:#e8f7ec;
+      border-color:#9fd3aa;
+      color:#166534;
+    }
+    .photo-link{
+      border:0;
+      background:transparent;
+      color:#1769aa;
+      padding:2px 0;
+      font-weight:750;
+      text-decoration:underline;
+      cursor:pointer;
+      font-size:.82rem;
+    }
+    .product-photo-preview{
+      display:block;
+      width:100%;
+      max-height:420px;
+      object-fit:contain;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#f7f8f8;
+      margin:12px 0 16px;
+    }
+    .photo-actions{flex-wrap:wrap}
+    .photo-actions .btn{flex:1 1 160px}
+
+    .photo-item-actions{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:2px;
+    }
+
+/* Correção de layout da Lista de Compras */
+.compras-section .item{
+  grid-template-columns:minmax(180px,1fr) minmax(125px,auto) auto !important;
+  grid-template-areas:
+    "produto preco quantidade"
+    "produto preco acoes";
+  column-gap:18px !important;
+  row-gap:8px !important;
+  align-items:center !important;
+}
+.compras-section .item > div:nth-child(1){grid-area:produto;min-width:0}
+.compras-section .item > .price-edit-wrap{grid-area:preco}
+.compras-section .item > .qty{
+  grid-area:quantidade;
+  display:block !important;
+  min-width:72px;
+  text-align:center;
+  white-space:nowrap;
+  font-weight:800;
+  color:#52605c;
+  padding:6px 8px;
+  background:#fff;
+  border:1px solid #d7dedc;
+  border-radius:9px;
+}
+.compras-section .item > .actions{
+  grid-area:acoes;
+  display:flex !important;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px !important;
+  flex-wrap:wrap;
+}
+.compras-section .photo-item-actions{
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:5px !important;
+}
+.compras-section .photo-link{
+  white-space:nowrap;
+}
+.compras-section .icon-btn{
+  flex:0 0 38px;
+  width:38px;
+  min-width:38px;
+  height:38px;
+}
+
+@media(max-width:720px){
+  .compras-section .item{
+    grid-template-columns:minmax(0,1fr) auto !important;
+    grid-template-areas:
+      "produto quantidade"
+      "preco preco"
+      "acoes acoes";
+    padding:14px !important;
+    gap:10px 12px !important;
+  }
+  .compras-section .item > .price-edit-wrap{
+    justify-content:flex-start !important;
+  }
+  .compras-section .item > .actions{
+    justify-content:flex-start !important;
+    border-top:1px solid #d8dfe2;
+    padding-top:10px;
+  }
+}
+
+@media(max-width:420px){
+  .compras-section .item > .actions{
+    gap:6px !important;
+  }
+  .compras-section .icon-btn{
+    flex-basis:36px;
+    width:36px;
+    min-width:36px;
+    height:36px;
+  }
+  .compras-section .photo-link{
+    font-size:.76rem;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -198,6 +325,32 @@
     </div>
   </div>
 
+
+<div class="modal-backdrop" id="replicarValorModal">
+  <div class="modal">
+    <h2>Valor dos itens</h2>
+    <p class="confirm-text" id="replicarValorTexto"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn secondary" id="btnReplicarNao">NÃO, INFORMAR SEPARADO</button>
+      <button type="button" class="btn btn-yellow" id="btnReplicarSim">REPLICAR O VALOR</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-backdrop" id="fotoProdutoModal">
+  <div class="modal photo-modal">
+    <h2>Foto do produto</h2>
+    <p class="confirm-text" id="fotoProdutoNome"></p>
+    <img id="fotoProdutoPreview" class="product-photo-preview" alt="Foto do produto">
+    <div class="modal-actions photo-actions">
+      <button type="button" class="btn secondary" id="btnFecharFoto">Fechar</button>
+      <button type="button" class="btn primary" id="btnTrocarFoto">📷 Tirar outra foto</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="cameraProdutoInput" accept="image/*" capture="environment" style="display:none">
+
 <script>
 const STORAGE_COMPRAS='lista_compras_v1',STORAGE_DISPENSA='dispensa_v1';let compras=load(STORAGE_COMPRAS),dispensa=load(STORAGE_DISPENSA),currentType='compra',editingId=null,pendingPurchase=null,filtroCompras='todos',buscaCompras='',buscaDispensa='',pendingConfirmAction=null;const formModal=document.getElementById('formModal'),confirmModal=document.getElementById('confirmModal'),itemForm=document.getElementById('itemForm'),nomeInput=document.getElementById('nome'),precoInput=document.getElementById('preco'),quantidadeInput=document.getElementById('quantidade'),priceField=document.getElementById('priceField');
 function load(k){try{const d=JSON.parse(localStorage.getItem(k));return Array.isArray(d)?d:[]}catch{return[]}}function save(){localStorage.setItem(STORAGE_COMPRAS,JSON.stringify(compras));localStorage.setItem(STORAGE_DISPENSA,JSON.stringify(dispensa));render()}function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}function normalizeName(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,' ')}function parseMoney(v){let t=String(v||'').trim().replace(/\s/g,'');if(!t)return 0;if(t.includes(',')&&t.includes('.'))t=t.lastIndexOf(',')>t.lastIndexOf('.')?t.replace(/\./g,'').replace(',','.'):t.replace(/,/g,'');else if(t.includes(','))t=t.replace(',','.');const n=Number(t.replace(/[^\d.-]/g,''));return Number.isFinite(n)?n:0}function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}function esc(t){return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}function existsInPantry(n){const x=normalizeName(n);return dispensa.some(i=>normalizeName(i.nome)===x)}
@@ -242,11 +395,54 @@ function openForm(type,item=null){currentType=type;editingId=item?item.id:null;d
 }
 function closeForm(){formModal.classList.remove('open');itemForm.reset();quantidadeInput.value=1;editingId=null}
 function render(){renderCompras();renderDispensa();const total=compras.reduce((s,i)=>{if(Array.isArray(i.precos)&&i.precos.length)return s+i.precos.reduce((a,b)=>a+Number(b||0),0);return s+Number(i.preco||0)*Number(i.quantidade||0)},0);document.getElementById('totalCompra').textContent=money(total);const totalItens=document.getElementById('totalItens');if(totalItens)totalItens.textContent=`Total de itens: ${compras.reduce((s,i)=>s+Number(i.quantidade||0),0)}`}
-function renderCompras(){const el=document.getElementById('listaCompras');if(!compras.length){el.innerHTML='<div class="empty">Nenhum item na lista de compras. Toque no <strong>+</strong> para adicionar.</div>';return}let lista=filtroCompras==='faltando'?compras.filter(i=>!i.picked):compras;if(buscaCompras)lista=lista.filter(i=>normalizeName(i.nome).includes(normalizeName(buscaCompras)));if(!lista.length){el.innerHTML='<div class="empty">Nenhum item encontrado.</div>';return}el.innerHTML=lista.map(i=>{const precos=Array.isArray(i.precos)?i.precos:[];const somaPrecos=precos.length?precos.reduce((a,b)=>a+Number(b||0),0):Number(i.preco||0)*Number(i.quantidade||0);const textoPreco=precos.length?precos.map((p,idx)=>`Item ${idx+1}: ${money(p)}`).join('<br>'):(Number(i.preco||0)>0?money(i.preco):'Adicionar valor');return `<div class="item ${i.picked?'picked':''}"><div><div class="product-name ${i.pantryMatched?'in-pantry':''}">${esc(i.nome)}</div><div class="item-meta">${i.quantidade} un.${somaPrecos>0?` • Total: ${money(somaPrecos)}`:''}</div></div><div class="price-edit-wrap"><div class="price-display ${somaPrecos>0?'':'empty'}">${textoPreco}</div><button class="icon-btn" onclick="editarValorCompra('${i.id}')" title="Adicionar ou editar valor">✏️</button></div><div class="qty">${i.quantidade} un.</div><div class="actions purchase-actions"><button class="icon-btn check" onclick="togglePicked('${i.id}')" title="${i.picked?'Desmarcar':'Marcar como comprado'}">✓</button><button class="icon-btn" onclick="editCompra('${i.id}')" title="Editar nome ou quantidade">📝</button><button class="icon-btn delete" onclick="deleteCompra('${i.id}')" title="Excluir">🗑️</button></div></div>`}).join('')}
+function renderCompras(){const el=document.getElementById('listaCompras');if(!compras.length){el.innerHTML='<div class="empty">Nenhum item na lista de compras. Toque no <strong>+</strong> para adicionar.</div>';return}let lista=filtroCompras==='faltando'?compras.filter(i=>!i.picked):compras;if(buscaCompras)lista=lista.filter(i=>normalizeName(i.nome).includes(normalizeName(buscaCompras)));if(!lista.length){el.innerHTML='<div class="empty">Nenhum item encontrado.</div>';return}el.innerHTML=lista.map(i=>{const precos=Array.isArray(i.precos)?i.precos:[];const somaPrecos=precos.length?precos.reduce((a,b)=>a+Number(b||0),0):Number(i.preco||0)*Number(i.quantidade||0);const textoPreco=precos.length?precos.map((p,idx)=>`Item ${idx+1}: ${money(p)}`).join('<br>'):(Number(i.preco||0)>0?money(i.preco):'Adicionar valor');return `<div class="item ${i.picked?'picked':''}"><div><div class="product-name ${i.pantryMatched?'in-pantry':''}">${esc(i.nome)}</div><div class="item-meta">${i.quantidade} un.${somaPrecos>0?` • Total: ${money(somaPrecos)}`:''}</div></div><div class="price-edit-wrap"><div class="price-display ${somaPrecos>0?'':'empty'}">${textoPreco}</div><button class="icon-btn" onclick="editarValorCompra('${i.id}')" title="Adicionar ou editar valor">✏️</button></div><div class="qty">${i.quantidade} un.</div><div class="actions purchase-actions"><div class="photo-item-actions"><button class="icon-btn camera-btn ${i.foto?'has-photo':''}" onclick="abrirCameraProduto('${i.id}')" title="${i.foto?'Tirar outra foto':'Adicionar foto'}">📷</button>${i.foto?`<button class="photo-link" onclick="visualizarFotoProduto('${i.id}')">Visualizar foto</button>`:''}</div><button class="icon-btn check" onclick="togglePicked('${i.id}')" title="${i.picked?'Desmarcar':'Marcar como comprado'}">✓</button><button class="icon-btn" onclick="editCompra('${i.id}')" title="Editar nome ou quantidade">📝</button><button class="icon-btn delete" onclick="deleteCompra('${i.id}')" title="Excluir">🗑️</button></div></div>`}).join('')}
 
 function renderDispensa(){const el=document.getElementById('listaDispensa');let lista=dispensa;if(buscaDispensa)lista=lista.filter(i=>normalizeName(i.nome).includes(normalizeName(buscaDispensa)));if(!lista.length){el.innerHTML='<div class="empty">Nenhum item encontrado na dispensa.</div>';return}el.innerHTML=lista.map(i=>`<div class="item"><div><div class="product-name">${esc(i.nome)}</div><div class="item-meta">${i.quantidade} un. na dispensa</div></div><div class="value"></div><div class="pantry-count">${i.quantidade} un.</div><div class="actions"><button class="icon-btn" onclick="editDispensa('${i.id}')">✏️</button><button class="icon-btn delete" onclick="deleteDispensa('${i.id}')">🗑️</button></div></div>`).join('')}
 
-function editarValorCompra(id){const item=compras.find(x=>x.id===id);if(!item)return;const qtd=Math.max(1,Number(item.quantidade||1));const novos=[];for(let idx=0;idx<qtd;idx++){const atual=Array.isArray(item.precos)&&item.precos[idx]!=null?Number(item.precos[idx]):0;const entrada=prompt(`Valor do item ${idx+1} de ${qtd} - "${item.nome}":`,atual>0?atual.toFixed(2).replace('.',','):'');if(entrada===null)return;novos.push(parseMoney(entrada));}compras=compras.map(x=>x.id===id?{...x,precos:novos,preco:0}:x);save()}
+function editarValorCompra(id){
+  const item=compras.find(x=>x.id===id);
+  if(!item)return;
+  const qtd=Math.max(1,Number(item.quantidade||1));
+  const valores=Array.isArray(item.precos)?item.precos.slice(0,qtd):[];
+  while(valores.length<qtd)valores.push(0);
+  let indice=0;
+
+  function salvar(){
+    compras=compras.map(x=>x.id===id?{...x,precos:valores,preco:0}:x);
+    save();
+  }
+
+  function proximo(){
+    if(indice>=qtd){salvar();return;}
+    const atual=Number(valores[indice]||0);
+    const entrada=prompt(`Valor do item ${indice+1} de ${qtd} - "${item.nome}":`,atual>0?atual.toFixed(2).replace('.',','):'');
+    if(entrada===null)return;
+    const valor=parseMoney(entrada);
+    valores[indice]=valor;
+
+    if(qtd>1 && indice===0){
+      const modal=document.getElementById('replicarValorModal');
+      document.getElementById('replicarValorTexto').textContent=`Deseja replicar ${money(valor)} para os demais ${qtd-1} item(ns)?`;
+      modal.classList.add('open');
+
+      document.getElementById('btnReplicarSim').onclick=()=>{
+        modal.classList.remove('open');
+        for(let i=1;i<qtd;i++)valores[i]=valor;
+        salvar();
+      };
+      document.getElementById('btnReplicarNao').onclick=()=>{
+        modal.classList.remove('open');
+        indice++;
+        proximo();
+      };
+      return;
+    }
+
+    indice++;
+    proximo();
+  }
+  proximo();
+}
 function togglePicked(id){compras=compras.map(i=>i.id===id?{...i,picked:!i.picked}:i);save()}
 function openActionConfirm(message,action,title='Confirmar'){
   const modal=document.getElementById('actionConfirmModal');
@@ -259,6 +455,47 @@ function closeActionConfirm(){
   document.getElementById('actionConfirmModal').classList.remove('open');
   pendingConfirmAction=null;
 }
+
+let produtoFotoId=null;
+
+function abrirCameraProduto(id){
+  const item=compras.find(x=>x.id===id);
+  if(!item)return;
+  produtoFotoId=id;
+  const input=document.getElementById('cameraProdutoInput');
+  input.value='';
+  input.click();
+}
+
+function comprimirFotoProduto(file,callback){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=900;
+      let w=img.width,h=img.height;
+      if(w>h&&w>max){h=Math.round(h*max/w);w=max}
+      else if(h>=w&&h>max){w=Math.round(w*max/h);h=max}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      callback(canvas.toDataURL('image/jpeg',0.72));
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function visualizarFotoProduto(id){
+  const item=compras.find(x=>x.id===id);
+  if(!item||!item.foto)return;
+  produtoFotoId=id;
+  document.getElementById('fotoProdutoNome').textContent=item.nome;
+  document.getElementById('fotoProdutoPreview').src=item.foto;
+  document.getElementById('fotoProdutoModal').classList.add('open');
+}
+
 function editCompra(id){const i=compras.find(x=>x.id===id);if(i)openForm('compra',i)}
 function editDispensa(id){const i=dispensa.find(x=>x.id===id);if(i)openForm('dispensa',i)}
 function deleteCompra(id){
@@ -278,7 +515,7 @@ function deleteDispensa(id){
     save();
   },'Excluir item');
 }
-function commitPurchase(item){if(editingId)compras=compras.map(x=>x.id===editingId?{...item,id:editingId,preco:Number(x.preco||0),precos:Array.isArray(x.precos)?x.precos.slice(0,Number(item.quantidade||1)):[],picked:!!x.picked}:x);else compras.push({...item,id:uid(),preco:0,precos:Array.isArray(item.precos)?item.precos:[],picked:false});save();closeForm()}
+function commitPurchase(item){if(editingId)compras=compras.map(x=>x.id===editingId?{...item,id:editingId,preco:Number(x.preco||0),precos:Array.isArray(x.precos)?x.precos.slice(0,Number(item.quantidade||1)):[],picked:!!x.picked,foto:x.foto||''}:x);else compras.push({...item,id:uid(),preco:0,precos:Array.isArray(item.precos)?item.precos:[],picked:false});save();closeForm()}
 itemForm.addEventListener('submit',e=>{e.preventDefault();const nome=nomeInput.value.trim(),quantidade=Math.max(1,parseInt(quantidadeInput.value||'1',10));if(!nome)return;if(currentType==='dispensa'){const item={nome,quantidade};if(editingId)dispensa=dispensa.map(x=>x.id===editingId?{...item,id:editingId}:x);else dispensa.push({...item,id:uid()});compras=compras.map(c=>({...c,pantryMatched:existsInPantry(c.nome)||normalizeName(c.nome)===normalizeName(nome)}));save();closeForm();return}let precos=[];if(currentType==='compra'&&document.querySelector('input[name="informarValor"]:checked')?.value==='sim'){const qtdAtual=Math.max(1,parseInt(quantidadeInput.value||'1',10));const mesmoValor=qtdAtual===1||document.querySelector('input[name="mesmoValor"]:checked')?.value!=='nao';const inputs=[...document.querySelectorAll('.unit-price-input')];if(mesmoValor&&inputs.length){const valorUnitario=parseMoney(inputs[0].value);precos=Array.from({length:qtdAtual},()=>valorUnitario);}else{precos=inputs.map(inp=>parseMoney(inp.value));}}const pantryMatch=existsInPantry(nome),item={nome,preco:0,precos,quantidade,pantryMatched:pantryMatch};if(pantryMatch){pendingPurchase=item;document.getElementById('confirmProduct').textContent=`"${nome}"`;confirmModal.classList.add('open');return}commitPurchase(item)});
 document.querySelectorAll('input[name="informarValor"]').forEach(r=>r.addEventListener('change',renderUnitValueInputs));
 document.querySelectorAll('input[name="mesmoValor"]').forEach(r=>r.addEventListener('change',renderUnitValueInputs));
@@ -309,6 +546,29 @@ if(actionConfirmYes)actionConfirmYes.onclick=()=>{
 if(actionConfirmModal)actionConfirmModal.onclick=e=>{
   if(e.target===actionConfirmModal)closeActionConfirm();
 };
+
+document.getElementById('cameraProdutoInput').addEventListener('change',e=>{
+  const file=e.target.files&&e.target.files[0];
+  if(!file||!produtoFotoId)return;
+  comprimirFotoProduto(file,foto=>{
+    compras=compras.map(x=>x.id===produtoFotoId?{...x,foto}:x);
+    save();
+    visualizarFotoProduto(produtoFotoId);
+  });
+});
+document.getElementById('btnFecharFoto').onclick=()=>{
+  document.getElementById('fotoProdutoModal').classList.remove('open');
+};
+document.getElementById('btnTrocarFoto').onclick=()=>{
+  document.getElementById('fotoProdutoModal').classList.remove('open');
+  if(produtoFotoId)abrirCameraProduto(produtoFotoId);
+};
+document.getElementById('fotoProdutoModal').onclick=e=>{
+  if(e.target===document.getElementById('fotoProdutoModal')){
+    document.getElementById('fotoProdutoModal').classList.remove('open');
+  }
+};
+
 const btnOcultarDispensa=document.getElementById('btnOcultarDispensa');
 const conteudoDispensa=document.getElementById('conteudoDispensa');
 if(btnOcultarDispensa&&conteudoDispensa){
